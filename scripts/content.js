@@ -84,7 +84,46 @@ async function run() {
   button.className = "selectable-button";
   button.addEventListener("click", () => {
     const items = Array.from(showListContainer.querySelectorAll(".shows-list-item"));
-    items.sort((a, b) => {
+
+    // Keep only one movie per title, title is in the textcontent of ".shows-list-item__title" element.
+    const titles = new Set();
+    const titleNodeAssoc = new Map();
+    items.forEach((item) => {
+      const title = item.querySelector("h3.shows-list-item__title").textContent;
+      if (titles.has(title)) {
+        const existingItem = titleNodeAssoc.get(title);
+
+        const timeList = existingItem.querySelector(".shows-list-item__time");
+        timeList.textContent +=
+          "\n" +
+          item.querySelector(".shows-list-item__time__start").textContent +
+          "\n" +
+          item.querySelector(".shows-list-item__location__name").textContent;
+
+        // const locationList = existingItem.querySelector(".shows-list-item__location");
+        // locationList.textContent += "," + item.querySelector(".shows-list-item__location__name").textContent;
+      } else {
+        titles.add(title);
+
+        const timeList = item.querySelector(".shows-list-item__time");
+        timeList.style.overflow = "hidden";
+        timeList.style.whiteSpace = "pre";
+        timeList.style.textOverflow = "ellipsis";
+        timeList.style.fontSize = "0.8em";
+        timeList.textContent =
+          timeList.querySelector(".shows-list-item__time__start").textContent +
+          "\n" +
+          item.querySelector(".shows-list-item__location__name").textContent;
+
+        const locationList = item.querySelector(".shows-list-item__location");
+        locationList.textContent = ""; //locationList.querySelector(".shows-list-item__location__name").textContent;
+
+        titleNodeAssoc.set(title, item);
+      }
+    });
+
+    const newItems = Array.from(titleNodeAssoc.values());
+    newItems.sort((a, b) => {
       const aRating = parseFloat(a.dataset.rating);
       const bRating = parseFloat(b.dataset.rating);
       if (isNaN(aRating) && isNaN(bRating)) return 0;
@@ -94,7 +133,13 @@ async function run() {
       if (aRating > bRating) return -1;
       return 0;
     });
+
+    // delte existing items
     items.forEach((item) => {
+      item.remove();
+    });
+
+    newItems.forEach((item) => {
       showListContainer.appendChild(item);
     });
   });
