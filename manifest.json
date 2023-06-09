@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "LetterBoxd Ratings for CineVille",
+  "version": "1.0",
+  "description": "Adds LetterBoxd ratings to CineVille's agenda page.",
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["https://www.cineville.nl/agenda"]
+    }
+  ],
+  "host_permissions": ["https://letterboxd.com/film/*"],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "permissions": ["storage"],
+  "icons": {
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  }
+}
